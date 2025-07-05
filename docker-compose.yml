@@ -1,0 +1,78 @@
+# docker-compose.yml (共通ベースファイル)
+# 開発・本番で共通のビルド情報、依存関係、基本的なネットワーク設定などを定義します。
+
+services:
+  remix:
+    build:
+      context: ./compose/remix
+      dockerfile: Dockerfile
+    command: sh -c "yarn start"
+    networks:
+      - app_network
+    depends_on:
+      api:
+        condition: service_healthy
+      orm:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - API_BASE_URL=http://api:3000
+    volumes:
+      - prisma_client_volume:/app/PrismaClient
+
+  api:
+    build:
+      context: ./compose/api
+      dockerfile: Dockerfile
+    command: sh -c "yarn start"
+    networks:
+      - app_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      orm:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - prisma_client_volume:/app/PrismaClient
+
+  orm:
+    build:
+      context: ./compose/orm
+      dockerfile: Dockerfile
+    networks:
+      - app_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - prisma_client_volume:/app/PrismaClient
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  prisma_client_volume:

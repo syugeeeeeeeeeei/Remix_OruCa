@@ -1,0 +1,18 @@
+// compose/orm/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "/app/PrismaClient/global" // ★既存: ここで出力先を指定
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ★ここから追加
+model TestItem {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+}
+// ★ここまで追加
