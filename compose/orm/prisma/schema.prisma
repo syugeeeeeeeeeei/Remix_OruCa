@@ -1,7 +1,7 @@
 // compose/orm/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "/app/PrismaClient/global" // ★既存: ここで出力先を指定
+  output   = "/app/ShardTypes/PrismaClient" // ★既存: ここで出力先を指定
 }
 
 datasource db {
@@ -9,10 +9,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ★ここから追加
-model TestItem {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
+// usersテーブルのモデル
+model User {
+  student_ID    String    @id @db.VarChar(16)
+  student_Name  String?   @db.VarChar(64)
+  student_token String    @db.VarChar(64)
+
+  // UserとLogの1対1リレーション
+  log           Log?
 }
-// ★ここまで追加
+
+// logsテーブルのモデル
+model Log {
+  student_ID String   @id @db.VarChar(16)
+  isInRoom   Boolean  @default(true)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp()
+
+  // Userへのリレーションを定義
+  user       User     @relation(fields: [student_ID], references: [student_ID], onDelete: Cascade)
+}

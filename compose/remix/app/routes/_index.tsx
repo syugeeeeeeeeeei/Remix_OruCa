@@ -1,5 +1,5 @@
 // compose/remix/app/routes/_index.tsx
-import type { TestItem } from "@PrismaClient/index"; // ★追加: 生成されたTestItemの型をインポート (ts lintエラーが出る場合、一旦無視して試してみてください)
+import type { TestItem } from "@ShardTypes/PrismaClient/index"; // ★追加: 生成されたTestItemの型をインポート (ts lintエラーが出る場合、一旦無視して試してみてください)
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 

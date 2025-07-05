@@ -27,6 +27,7 @@ services:
       - /app/node_modules
     command: sh -c "npx prisma migrate dev --name init && npx prisma generate"
 
+
   # Prisma Studioは開発環境でのみ起動
   prisma_studio:
     build:
@@ -35,13 +36,14 @@ services:
     ports:
       - "5555:5555"
     networks:
-      - app_network
+      - oruca_network
     depends_on:
       - orm
     environment:
       - DATABASE_URL=${DATABASE_URL}
     command: npx prisma studio --port 5555
     tty: true
+    stdin_open: true
 
   postgres:
     container_name: postgres_dev

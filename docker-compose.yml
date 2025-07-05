@@ -6,27 +6,26 @@ services:
     build:
       context: ./compose/remix
       dockerfile: Dockerfile
-    command: sh -c "yarn start"
     networks:
-      - app_network
+      - oruca_network
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
       orm:
         condition: service_completed_successfully
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - API_BASE_URL=http://api:3000
+      - WS_URL=ws://api:3000
     volumes:
-      - prisma_client_volume:/app/PrismaClient
-
+      - prisma_client_volume:/app/ShardTypes/PrismaClient:ro
+      - user_def_types_volume:/app/ShardTypes/UserDefTypes
   api:
     build:
       context: ./compose/api
       dockerfile: Dockerfile
-    command: sh -c "yarn start"
     networks:
-      - app_network
+      - oruca_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,27 +33,23 @@ services:
         condition: service_completed_successfully
     environment:
       - DATABASE_URL=${DATABASE_URL}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     volumes:
-      - prisma_client_volume:/app/PrismaClient
+      - prisma_client_volume:/app/ShardTypes/PrismaClient:ro
+      - user_def_types_volume:/app/ShardTypes/UserDefTypes
 
   orm:
     build:
       context: ./compose/orm
       dockerfile: Dockerfile
     networks:
-      - app_network
+      - oruca_network
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       - DATABASE_URL=${DATABASE_URL}
     volumes:
-      - prisma_client_volume:/app/PrismaClient
+      - prisma_client_volume:/app/ShardTypes/PrismaClient
 
   postgres:
     image: postgres:17-alpine
@@ -68,11 +63,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - app_network
+      - oruca_network
 
 networks:
-  app_network:
+  oruca_network:
     driver: bridge
 
 volumes:
   prisma_client_volume:
+  user_def_types_volume:

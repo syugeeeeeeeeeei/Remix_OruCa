@@ -5,26 +5,32 @@ services:
   remix:
     container_name: remix
     restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+      orm:
+        condition: service_completed_successfully
     networks:
-      - external_network # Caddy用の外部ネットワークを追加
+      - fukaya-lab-server # Caddy用の外部ネットワークを追加
     labels:
-      caddy: your_domain.com
+      caddy: oruca.fukaya-sus.lab
       caddy.reverse_proxy: "{{.Name}}:3000"
-    volumes:
-      - prisma_client_volume:/app/PrismaClient:ro
+    command: sh -c "yarn start"
+
 
   api:
     container_name: api
     restart: unless-stopped
-    volumes:
-      - prisma_client_volume:/app/PrismaClient:ro
-    # commandはDockerfile内のCMDに任せる（もしくは `yarn start` などを指定）
+    command: sh -c "yarn start"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://api:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   orm:
     container_name: orm
     command: sh -c "npx prisma migrate deploy && npx prisma generate"
-    volumes:
-      - prisma_client_volume:/app/PrismaClient
 
   postgres:
     container_name: postgres
@@ -33,9 +39,9 @@ services:
     restart: unless-stopped
 
 networks:
-  external_network:
+  fukaya-lab-server:
     external: true
-    name: your_external_network # Caddyなどが属する既存のネットワーク名
+    name: fukaya-lab-server # Caddyなどが属する既存のネットワーク名
 
 volumes:
   postgres_data:
