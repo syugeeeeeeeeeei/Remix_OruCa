@@ -34,6 +34,7 @@ services:
         condition: service_completed_successfully
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
       - ./ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes

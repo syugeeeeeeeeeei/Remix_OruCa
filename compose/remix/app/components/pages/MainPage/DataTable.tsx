@@ -8,7 +8,7 @@ import {
 	Tr,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "~/components/Badge";
 import { TableEmptyState } from "~/components/TableEmptyState";
 import { useWebSocket } from "~/contexts/WebSocketProvider";
@@ -27,17 +27,25 @@ interface DataTableProps {
 export function DataTable({ initialData }: DataTableProps) {
 	const [logs, setLogs] = useState<LogWithUser[]>(initialData);
 	const { lastMessage } = useWebSocket();
+	const isInitialMount = useRef(true); // マウント直後かどうかを判定するフラグ
 
 	useEffect(() => {
 		if (lastMessage !== null) {
 			const message: TWsMessage = JSON.parse(lastMessage.data);
 			if (message.type === "log/fetch" && message.payload.content) {
-				// APIからのデータもこの型にキャスト
 				setLogs(message.payload.content as LogWithUser[]);
-				playBeep(1200, 0.1, 0.2);
+
+				// --- 音声再生ロジックの修正 ---
+				if (isInitialMount.current) {
+					// 最初のデータロードでは音を鳴らさない
+					isInitialMount.current = false;
+				} else {
+					// 2回目以降のデータ更新時に音を鳴らす
+					playBeep(1200, 0.1, 0.2).catch(err => console.warn(err.message));
+				}
 			}
 		}
-	}, [lastMessage, setLogs]);
+	}, [lastMessage]);
 
 	const thStyles = {
 		color: "gray.100",
@@ -90,8 +98,12 @@ export function DataTable({ initialData }: DataTableProps) {
 	);
 }
 
-function playBeep(hz: number, volume: number, length: number) {
+// playBeep関数をPromiseを返すように修正
+async function playBeep(hz: number, volume: number, length: number) {
+	// AudioContextがユーザー操作によって有効化されるのを待つ
 	const audioCtx = new (window.AudioContext)();
+	await audioCtx.resume();
+
 	const oscillator = audioCtx.createOscillator();
 	const gainNode = audioCtx.createGain();
 

@@ -15,7 +15,7 @@ export const handleLogWrite = async (c: Context<AppContext>) => {
 	}
 
 	const { student_ID } = validationResult.data.payload.content;
-	const admin_pass = process.env.ADMIN_DEFAULT_PASSWORD || 'fukaya_lab';
+	const admin_pass = process.env.ADMIN_PASSWORD || 'fukayalab942';
 
 	try {
 		const generateSHA256Hash = (input: string): string => createHash("sha256").update(input).digest("hex");

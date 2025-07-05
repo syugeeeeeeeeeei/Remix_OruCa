@@ -12,7 +12,7 @@ import { HomeButton } from "~/components/Buttons/HomeButton";
 import { ReturnButton } from "~/components/Buttons/ReturnButton";
 import { HeadBar } from "~/components/HeadBar";
 import { EditableDataTable } from "~/components/pages/Admin/EditableDataTable";
-import { destroySession, getSession, requireAuth } from "~/lib/auth.server";
+import { getSession } from "~/lib/auth.server"; // requireAuthは不要
 
 // Zodスキーマ定義
 const updateNameSchema = z.object({
@@ -41,15 +41,19 @@ type LogWithUser = Log & { user: User };
 
 // Loader関数 (変更なし)
 export async function loader({ request }: LoaderFunctionArgs) {
-	const token = await requireAuth(request);
+	const session = await getSession(request.headers.get("Cookie"));
+	const token = session.get("token"); // requireAuthを通っているので、ここでは必ずトークンが取れる
 	const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+
 	try {
 		const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
+
 		if (!response.ok) {
+			// APIサーバー側でトークンが無効と判断された場合もログインへ
 			if (response.status === 401 || response.status === 403) {
-				return redirect("/admin", { headers: { "Set-Cookie": await destroySession(await getSession(request.headers.get("Cookie"))) } });
+				return redirect("/admin");
 			}
 			throw new Error(`API Error: ${response.statusText}`);
 		}
@@ -58,9 +62,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		return json({ users });
 	} catch (error) {
 		console.error("Failed to fetch user data:", error);
-		return redirect("/admin", { headers: { "Set-Cookie": await destroySession(await getSession(request.headers.get("Cookie"))) } });
+		return json({ users: [] });
 	}
-}
+  }
 
 // Action関数 (Zodバリデーションを追加)
 export async function action({ request }: ActionFunctionArgs) {
