@@ -1,4 +1,4 @@
-import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
+import type { AppContext } from '@/api/types.js';
 import type { Context, Next } from 'hono';
 import jwt from 'jsonwebtoken';
 

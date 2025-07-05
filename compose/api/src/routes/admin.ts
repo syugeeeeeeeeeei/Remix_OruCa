@@ -1,6 +1,6 @@
+import type { AppContext } from '@/api/types.js';
 import { handleDeleteUser, handleUpdateUserName } from '@/handlers/adminHandler.js';
 import { authMiddleware } from '@/middleware/auth.js';
-import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import { Hono } from 'hono';
 
 const adminRoutes = new Hono<AppContext>();

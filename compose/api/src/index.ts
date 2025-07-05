@@ -1,3 +1,4 @@
+import type { AppContext } from '@/api/types.js';
 import { SERVER_CONFIG } from '@/config.js';
 import { broadcastData } from '@/handlers/webSocketHandler.js';
 import { adminRoutes } from '@/routes/admin.js';
@@ -5,7 +6,6 @@ import { authRoutes } from '@/routes/auth.js';
 import { httpRoutes } from '@/routes/http.js';
 import { webSocketRoutes } from '@/routes/websocket.js';
 import { serve } from '@hono/node-server';
-import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import { Hono } from 'hono';
 
 const app = new Hono<AppContext>();

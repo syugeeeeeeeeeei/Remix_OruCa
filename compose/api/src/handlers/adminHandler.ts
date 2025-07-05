@@ -1,5 +1,5 @@
+import type { AppContext } from '@/api/types.js';
 import { prisma } from '@/db.js';
-import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import type { Context } from 'hono';
 
 // ユーザー名更新ハンドラ

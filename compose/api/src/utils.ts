@@ -1,5 +1,5 @@
 // src/utils.ts
-import type { TWsMessage } from '@ShardTypes/UserDefTypes/api/types.js';
+import type { TWsMessage } from '@/api/types.js';
 import type { WSContext } from 'hono/ws';
 import type { WebSocket } from 'ws';
 

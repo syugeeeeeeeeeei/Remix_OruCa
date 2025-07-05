@@ -1,6 +1,6 @@
+import type { TWsMessage } from '@/api/types.js';
 import { prisma } from '@/db.js';
 import { sendWsMessage } from '@/utils.js';
-import type { TWsMessage } from '@ShardTypes/UserDefTypes/api/types.js';
 import type { WSContext } from 'hono/ws'; // ★追加
 import type { WebSocket } from 'ws';
 
