@@ -1,6 +1,7 @@
 import type { TWsMessage } from '@/api/types.js';
 import { prisma } from '@/db.js';
 import { sendWsMessage } from '@/utils.js';
+import { wsMessageSchema } from '@/validators.js';
 import type { WSContext } from 'hono/ws'; // ★追加
 import type { WebSocket } from 'ws';
 
@@ -68,7 +69,13 @@ export const onOpen = async (evt: Event, ws: WSContext<WebSocket>) => { // ★�
 };
 
 export const onMessage = async (evt: MessageEvent, ws: WSContext<WebSocket>) => { // ★型を変更
-	const data: TWsMessage = JSON.parse(evt.data);
+	const validationResult = wsMessageSchema.safeParse(JSON.parse(evt.data));
+	if (!validationResult.success) {
+		console.error("無効なWebSocketメッセージ:", validationResult.error);
+		return;
+	}
+
+	const data = validationResult.data;
 
 	if (data.type === 'log/fetch') {
 		try {

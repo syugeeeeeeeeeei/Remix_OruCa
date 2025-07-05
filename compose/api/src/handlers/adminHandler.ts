@@ -1,15 +1,19 @@
 import type { AppContext } from '@/api/types.js';
 import { prisma } from '@/db.js';
+import { updateUserNameSchema } from '@/validators.js';
 import type { Context } from 'hono';
 
 // ユーザー名更新ハンドラ
 export const handleUpdateUserName = async (c: Context<AppContext>) => {
 	const userId = c.req.param('id');
-	const { student_Name } = await c.req.json();
+	const body = await c.req.json();
+	const validationResult = updateUserNameSchema.safeParse(body);
 
-	if (!student_Name) {
-		return c.json({ message: '氏名は必須です' }, 400);
+	if (!validationResult.success) {
+		return c.json({ message: '入力データが不正です', errors: validationResult.error.errors }, 400);
 	}
+
+	const { student_Name } = validationResult.data;
 
 	try {
 		await prisma.user.update({

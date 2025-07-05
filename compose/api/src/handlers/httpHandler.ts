@@ -2,23 +2,19 @@
 import type { AppContext } from '@/api/types.js';
 import { prisma } from '@/db.js';
 import { notifySlackBot } from '@/services/slackService.js';
-import { hasProps } from '@/utils.js';
+import { logWriteSchema } from '@/validators.js';
 import type { Context } from 'hono';
 import { createHash } from 'node:crypto';
 
 export const handleLogWrite = async (c: Context<AppContext>) => {
 	const body = await c.req.json();
-	const { payload } = body;
+	const validationResult = logWriteSchema.safeParse(body);
 
-	if (
-		!payload ||
-		!hasProps<{ content: { student_ID: string } }>(payload, ['content']) ||
-		!hasProps<{ student_ID: string }>(payload.content, ['student_ID'])
-	) {
-		return c.json({ message: 'データの構造が不正です' }, 400);
+	if (!validationResult.success) {
+		return c.json({ message: 'データの構造が不正です', errors: validationResult.error.errors }, 400);
 	}
 
-	const { student_ID } = payload.content;
+	const { student_ID } = validationResult.data.payload.content;
 	const admin_pass = process.env.ADMIN_DEFAULT_PASSWORD || 'fukaya_lab';
 
 	try {

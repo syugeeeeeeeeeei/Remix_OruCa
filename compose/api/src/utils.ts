@@ -3,11 +3,6 @@ import type { TWsMessage } from '@/api/types.js';
 import type { WSContext } from 'hono/ws';
 import type { WebSocket } from 'ws';
 
-export const hasProps = <T extends object>(obj: any, props: (keyof T)[]): obj is T => {
-	if (!obj) return false;
-	return props.every((prop) => prop in obj);
-};
-
 export const sendWsMessage = (ws: WSContext<WebSocket>, data: TWsMessage): void => {
 	try {
 		if (ws.readyState === 1) { // WebSocket.OPEN

@@ -1,14 +1,18 @@
 import { prisma } from '@/db.js';
+import { loginSchema } from '@/validators.js';
 import type { Context } from 'hono';
 import jwt from 'jsonwebtoken';
 import { createHash } from 'node:crypto';
 
 export const handleLogin = async (c: Context) => {
-	const { student_ID, password } = await c.req.json();
+	const body = await c.req.json();
+	const validationResult = loginSchema.safeParse(body);
 
-	if (!student_ID || !password) {
-		return c.json({ message: 'IDとパスワードは必須です' }, 400);
+	if (!validationResult.success) {
+		return c.json({ message: '入力データが不正です', errors: validationResult.error.errors }, 400);
 	}
+
+	const { student_ID, password } = validationResult.data;
 
 	const user = await prisma.user.findUnique({ where: { student_ID } });
 	if (!user) {

@@ -36,6 +36,25 @@ services:
     volumes:
       - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
       - ./ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
+    
+  nfc:
+    build:
+      context: ./compose/nfc
+      dockerfile: Dockerfile
+    init: true
+    networks:
+      - oruca_network
+    depends_on:
+      api:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      - API_BASE_URL=http://api:3000
+      - WS_URL=ws://api:3000
+    command: ["python","main.py"]
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
 
   orm:
     build:
