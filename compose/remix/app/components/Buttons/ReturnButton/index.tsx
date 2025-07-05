@@ -15,12 +15,14 @@ export const ReturnButton: React.FC<ReturnButtonProps> = ({ address }) => {
 			icon={<BsArrowReturnLeft />}
 			size={["md", null, "lg"]}
 			isRound
-			colorScheme="gray"
+			backgroundColor="red.500"
+			color="white"
 			variant="solid"
 			shadow="md"
 			transition="transform 0.6s ease-in-out"
 			_hover={{
 				transform: 'rotate(-360deg)',
+				backgroundColor: "red.600"
 			}}
 		/>
 	);

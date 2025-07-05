@@ -1,5 +1,4 @@
 import {
-	Badge,
 	Table,
 	TableContainer,
 	Tbody,
@@ -11,28 +10,32 @@ import {
 import type { Log, User } from '@ShardTypes/PrismaClient';
 import { format } from 'date-fns';
 import { useEffect, useState } from "react";
+import { Badge } from "~/components/Badge";
 import { useWebSocketContext } from "~/contexts/WebSocketProvider";
 
+// サーバーサイドの元の型
 export type LogWithUser = Log & { user: User | null };
+// クライアントサイドで受け取る際の型
+type ClientLogWithUser = Omit<LogWithUser, 'updated_at' | 'user'> & {
+	updated_at: string;
+	// ★★★ userプロパティがnullになる可能性を型定義に反映 ★★★
+	user: (Omit<User, 'updated_at'> & { updated_at?: string }) | null;
+};
 
 interface DataTableProps {
-	initialData: LogWithUser[];
+	initialData: ClientLogWithUser[];
 }
 
 export function DataTable({ initialData }: DataTableProps) {
-	const [logs, setLogs] = useState<LogWithUser[]>(initialData);
-	// ★★★ 修正点: lastMessage の代わりに lastJsonMessage を使用 ★★★
+	const [logs, setLogs] = useState<ClientLogWithUser[]>(initialData);
 	const { lastJsonMessage } = useWebSocketContext();
 
-	// ★★★ 修正点: useEffect のロジックを簡素化 ★★★
 	useEffect(() => {
-		// lastJsonMessage が存在し、その型が 'log/fetch' の場合にのみ処理
 		if (lastJsonMessage && lastJsonMessage.type === "log/fetch") {
-			// `payload.content` にデータ本体が入っているので、それで state を更新
 			setLogs(lastJsonMessage.payload.content);
 			playBeep(1200, 0.1, 0.2).catch(err => console.warn(err.message));
 		}
-	}, [lastJsonMessage]); // 依存配列を lastJsonMessage に変更
+	}, [lastJsonMessage]);
 
 	const thStyles = {
 		color: "gray.100",
@@ -62,12 +65,11 @@ export function DataTable({ initialData }: DataTableProps) {
 						<Tr key={item.student_ID}>
 							<Td {...tdStyles}>{item.student_ID}</Td>
 							<Td {...tdStyles}>
-								{item.user ? item.user.student_Name || "（未登録）" : "（未登録）"}
+								{/* ★★★ userがnullの場合を考慮 ★★★ */}
+								{item.user ? item.user.student_Name || "（未登録）" : "（ユーザー情報なし）"}
 							</Td>
-							<Td {...tdStyles}>
-								<Badge colorScheme={item.isInRoom ? "green" : "red"} variant="solid">
-									{item.isInRoom ? "在室" : "退室"}
-								</Badge>
+							<Td {...tdStyles} textAlign="center">
+								<Badge isTrue={item.isInRoom} text={{ true: '在室', false: '不在' }} />
 							</Td>
 							<Td {...tdStyles}>{format(new Date(item.updated_at), "HH:mm")}</Td>
 						</Tr>
@@ -78,9 +80,7 @@ export function DataTable({ initialData }: DataTableProps) {
 	);
 }
 
-// playBeep関数をPromiseを返すように修正
 async function playBeep(hz: number, volume: number, length: number) {
-	// AudioContextがユーザー操作によって有効化されるのを待つ
 	const audioCtx = new (window.AudioContext)();
 	await audioCtx.resume();
 

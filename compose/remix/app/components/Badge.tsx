@@ -1,4 +1,4 @@
-import { Badge as ChakraBadge, Text, HStack } from "@chakra-ui/react";
+import { Box, HStack, Text } from "@chakra-ui/react";
 import React from 'react';
 
 interface BadgeProps {
@@ -14,14 +14,21 @@ export const Badge: React.FC<BadgeProps> = ({ isTrue, text }) => {
 	const message = isTrue ? text.true : text.false;
 
 	return (
-		<ChakraBadge
-			colorScheme={colorScheme}
-			variant="subtle"
-			p={2}
+		<HStack
+			border="1px solid"
+			borderColor={`${colorScheme}.500`}
+			backgroundColor={`${colorScheme}.100`}
+			color={`${colorScheme}.700`}
+			px={2}
+			py={1}
 			borderRadius="md"
 			fontWeight="bold"
+			spacing={2}
+			display="inline-flex"
+			alignItems="center"
 		>
-			{message}
-		</ChakraBadge>
+			<Box w="8px" h="8px" borderRadius="full" bg={`${colorScheme}.500`} />
+			<Text>{message}</Text>
+		</HStack>
 	);
 }

@@ -22,6 +22,7 @@ export const NameInput: React.FC<NameInputProps> = ({ initialName, isEditing, on
 					defaultValue={name}
 					onChange={(e) => setName(e.target.value)}
 					size="sm"
+					w="80%"
 				/>
 				<CheckButton
 					aria-label="変更を保存"

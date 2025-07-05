@@ -53,17 +53,19 @@ export async function action({ request }: ActionFunctionArgs) {
 		const { token } = await api.login(validationResult.data);
 		session.set("token", token);
 
+		// ★★★ セッションにフラッシュメッセージを設定 ★★★
+		session.flash("success", "ログインに成功しました");
+
 		return redirect("/admin/settings", {
 			headers: {
+				// ★★★ フラッシュメッセージを保存するためにセッションをコミット ★★★
 				"Set-Cookie": await commitSession(session),
 			},
 		});
 	} catch (error) {
 		const status = error instanceof Response ? error.status : 500;
-		// ★★★ 修正点: APIからの具体的なエラーメッセージを抽出する ★★★
 		const errorData = error instanceof Response ? await error.json().catch(() => ({ message: "ログインに失敗しました" })) : { message: "サーバーとの通信に失敗しました" };
 
-		// `errorData.message` をフォームエラーとして返す
 		return Response.json({ errors: { form: errorData.message } }, { status });
 	}
 }
@@ -77,10 +79,10 @@ export default function LoginPage() {
 		<HeadBar otherElements={[<HomeButton address="/" />]}>
 			<Box w="100%" h="100%" display="flex" alignItems="center" justifyContent="center">
 				<Card p={[4, null, 10]} borderWidth={1} shadow="md" w="fit-content">
+					{/* ★★★ 標準のFormコンポーネントを使用 ★★★ */}
 					<Form method="post">
 						<VStack spacing={6}>
 							<Heading size="lg">管理者ログイン</Heading>
-							{/* ★★★ 修正点: actionから返されたエラーメッセージを表示 ★★★ */}
 							{actionData?.errors?.form && (
 								<Text color="red.500" w="100%" textAlign="center">{actionData.errors.form}</Text>
 							)}

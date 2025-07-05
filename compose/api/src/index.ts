@@ -8,6 +8,11 @@ import { adminRoutes } from '@/routes/admin.js';
 import { authRoutes } from '@/routes/auth.js';
 import { httpRoutes } from '@/routes/http.js';
 import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
+import type { WSContext } from 'hono/ws';
+import type { WebSocket } from 'ws';
+
+// カスタムコンテキストの型定義をここにもインポート（または定義）
+type CustomWSContext = WSContext<WebSocket> & { clientId: number };
 
 // 1. Honoアプリケーションを初期化
 const app = new Hono<AppContext>();
@@ -31,10 +36,11 @@ app.get(
 	'/socket',
 	upgradeWebSocket((c) => {
 		return {
-			onOpen: (evt, ws) => onOpen(evt, ws),
-			onMessage: (evt, ws) => onMessage(evt, ws),
-			onClose: (evt, ws) => onClose(evt, ws),
-			onError: (evt, ws) => onError(evt, ws),
+			// ★★★ onOpenは元の型で受け取り、他のハンドラでは型アサーションを行う ★★★
+			onOpen: (evt, ws) => onOpen(evt, ws ),
+			onMessage: (evt, ws) => onMessage(evt, ws as CustomWSContext),
+			onClose: (evt, ws) => onClose(evt, ws as CustomWSContext),
+			onError: (evt, ws) => onError(evt, ws as CustomWSContext),
 		};
 	})
 );
@@ -44,7 +50,8 @@ const server = serve({
 	fetch: app.fetch,
 	port: SERVER_CONFIG.port,
 }, (info) => {
-	console.log(`APIサーバーは http://localhost:${info.port} で実行中`);
+	// サーバー起動時のログはシンプルにする
+	console.log(`🚀 API server listening on http://localhost:${info.port}`);
 });
 
 // 4. 起動したサーバーにWebSocket機能を注入

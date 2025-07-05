@@ -13,10 +13,17 @@ import { useState } from "react";
 import { DeleteDialog } from "./DeleteDialog";
 import { NameInput } from "./NameInput";
 
-type LogWithUser = Log & { user: User };
+// サーバーサイドの元の型
+type LogWithUser = Log & { user: User | null };
+// クライアントサイドで受け取る際の型 (updated_atがstringになり、userがnullになる可能性がある)
+type ClientLogWithUser = Omit<LogWithUser, 'updated_at' | 'user'> & {
+	updated_at: string;
+	// ★★★ userプロパティがnullになる可能性を型定義に反映 ★★★
+	user: (Omit<User, 'updated_at'> & { updated_at?: string }) | null;
+};
 
 interface EditableDataTableProps {
-	data: LogWithUser[];
+	data: ClientLogWithUser[];
 }
 
 export function EditableDataTable({ data }: EditableDataTableProps) {
@@ -52,7 +59,7 @@ export function EditableDataTable({ data }: EditableDataTableProps) {
 								<Form method="post">
 									<input type="hidden" name="student_ID" value={item.student_ID} />
 									<NameInput
-										initialName={item.user.student_Name || ""}
+										initialName={item.user?.student_Name || ""}
 										isEditing={editingRow === item.student_ID}
 										onEdit={() => setEditingRow(item.student_ID)}
 										onCancel={() => setEditingRow(null)}
@@ -62,7 +69,7 @@ export function EditableDataTable({ data }: EditableDataTableProps) {
 							<Td {...tdStyles}>
 								<DeleteDialog
 									student_ID={item.student_ID}
-									student_Name={item.user.student_Name || '未登録'}
+									student_Name={item.user?.student_Name || '未登録'}
 								/>
 							</Td>
 						</Tr>
@@ -71,4 +78,4 @@ export function EditableDataTable({ data }: EditableDataTableProps) {
 			</Table>
 		</TableContainer>
 	);
-  }
+}

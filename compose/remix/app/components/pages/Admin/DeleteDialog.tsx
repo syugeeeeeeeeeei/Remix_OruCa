@@ -24,7 +24,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({ student_ID, student_
 
 	return (
 		<>
-			<DeleteButton onClick={onOpen} />
+			<DeleteButton aria-label="Delete user" onClick={onOpen} />
 			<Modal isOpen={isOpen} onClose={onClose} isCentered>
 				<ModalOverlay />
 				<ModalContent>

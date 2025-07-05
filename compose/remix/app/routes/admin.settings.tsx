@@ -1,84 +1,84 @@
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, VStack, useToast } from "@chakra-ui/react";
 import {
+	json,
 	redirect,
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { HomeButton } from "~/components/Buttons/HomeButton";
 import { ReturnButton } from "~/components/Buttons/ReturnButton";
 import { HeadBar } from "~/components/HeadBar";
 import { EditableDataTable } from "~/components/pages/Admin/EditableDataTable";
 import { getApiClient } from "~/lib/api.server";
-import { destroySession, getSession, requireAuth } from "~/lib/auth.server";
+import { commitSession, destroySession, getSession, requireAuth } from "~/lib/auth.server";
 
-// Zodスキーマ定義
+// Zodスキーマ定義 (変更なし)
 const updateNameSchema = z.object({
 	intent: z.literal("updateName"),
 	student_ID: z.string().min(1),
 	student_Name: z.string().min(1, "名前を入力してください"),
 });
-
 const deleteUserSchema = z.object({
 	intent: z.literal("deleteUser"),
 	student_ID: z.string().min(1),
 });
-
 const logoutSchema = z.object({
 	intent: z.literal("logout"),
 });
-
 const actionSchema = z.discriminatedUnion("intent", [
 	updateNameSchema,
 	deleteUserSchema,
 	logoutSchema,
 ]);
 
-// Loader関数 (Response.json を使用)
 export async function loader({ request }: LoaderFunctionArgs) {
 	const token = await requireAuth(request);
+	const session = await getSession(request.headers.get("Cookie"));
 	const api = getApiClient(token);
+
+	// ★★★ セッションからフラッシュメッセージを取得 ★★★
+	const successMessage = session.get("success") || null;
 
 	try {
 		const { users } = await api.getUsers();
-		return Response.json({ users });
+
+		// ★★★ メッセージとユーザーデータを返し、セッションをコミットしてフラッシュをクリア ★★★
+		return json({ users, successMessage }, {
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			}
+		});
 	} catch (error) {
 		if (error instanceof Response && (error.status === 401 || error.status === 403)) {
-			// トークンが無効ならログインページへリダイレクト
 			return redirect("/admin", {
-				headers: { "Set-Cookie": await destroySession(await getSession(request.headers.get("Cookie"))) }
+				headers: { "Set-Cookie": await destroySession(session) }
 			});
 		}
-		// その他のエラーはそのままスローしてErrorBoundaryに処理を委ねる
 		throw error;
 	}
 }
 
-// Action関数 (Response.json を使用)
+// Action関数 (変更なし)
 export async function action({ request }: ActionFunctionArgs) {
 	const token = await requireAuth(request);
 	const api = getApiClient(token);
 	const formData = await request.formData();
 	const fields = Object.fromEntries(formData.entries());
-
-	// Zodでバリデーション
 	const validationResult = actionSchema.safeParse(fields);
 	if (!validationResult.success) {
 		return Response.json({ error: "無効なリクエストです。", details: validationResult.error.flatten() }, { status: 400 });
 	}
-
 	const { intent } = validationResult.data;
-
 	try {
-		// ログアウト処理
 		if (intent === "logout") {
+			const session = await getSession(request.headers.get("Cookie"));
 			return redirect("/admin", {
-				headers: { "Set-Cookie": await destroySession(await getSession(request.headers.get("Cookie"))) },
+				headers: { "Set-Cookie": await destroySession(session) },
 			});
 		}
-
-		// APIリクエスト
 		if (intent === "updateName") {
 			const { student_ID, student_Name } = validationResult.data;
 			await api.updateUserName(student_ID, student_Name);
@@ -86,9 +86,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			const { student_ID } = validationResult.data;
 			await api.deleteUser(student_ID);
 		}
-
 		return Response.json({ success: true });
-
 	} catch (error) {
 		if (error instanceof Response) {
 			const errorData = await error.json().catch(() => ({ message: "An unexpected error occurred" }));
@@ -99,9 +97,23 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-// コンポーネント
 export default function SettingsPage() {
-	const { users } = useLoaderData<typeof loader>();
+	const { users, successMessage } = useLoaderData<typeof loader>();
+	const toast = useToast();
+
+	// ★★★ loaderから渡されたメッセージを元にトーストを表示 ★★★
+	useEffect(() => {
+		if (successMessage) {
+			toast({
+				title: successMessage,
+				status: "success",
+				duration: 2000,
+				isClosable: true,
+				position: "top",
+			});
+		}
+	}, [successMessage, toast]);
+
 	return (
 		<HeadBar
 			otherElements={[

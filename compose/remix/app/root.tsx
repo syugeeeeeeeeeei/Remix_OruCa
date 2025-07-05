@@ -49,7 +49,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ChakraProvider theme={theme}>
-      {/* ClientOnlyを使用して、WebSocketProviderがブラウザでのみレンダリングされるようにする */}
       <ClientOnly fallback={<p>Loading WebSocket...</p>}>
         {() => (
           <WebSocketProvider>

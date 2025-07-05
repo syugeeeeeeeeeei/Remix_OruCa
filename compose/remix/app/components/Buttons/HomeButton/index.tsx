@@ -15,12 +15,14 @@ export const HomeButton: React.FC<HomeButtonProps> = ({ address }) => {
 			icon={<AiOutlineHome />}
 			size={["md", null, "lg"]}
 			isRound
-			colorScheme="purple"
+			backgroundColor="rgb(30, 14, 81)"
+			color="white"
 			variant="solid"
 			shadow="md"
 			transition="transform 0.6s ease-in-out"
 			_hover={{
 				transform: 'rotate(360deg)',
+				backgroundColor: "rgb(50, 34, 111)"
 			}}
 		/>
 	);

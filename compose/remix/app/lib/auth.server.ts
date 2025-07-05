@@ -30,7 +30,7 @@ export async function requireAuth(request: Request): Promise<string> {
 	const token = session.get("token");
 
 	if (!token || typeof token !== "string") {
-		// トークンがなければ、セッションを破棄してリダイレクト
+		// ★★★ トークンが無効な場合はセッションを破棄してリダイレクト ★★★
 		throw redirect("/admin", {
 			headers: {
 				"Set-Cookie": await destroySession(session),
