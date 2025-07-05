@@ -1,8 +1,8 @@
 // src/handlers/httpHandler.ts
 import { prisma } from '@/db.js';
 import { notifySlackBot } from '@/services/slackService.js';
-import type { AppContext } from '@/types.js';
 import { hasProps } from '@/utils.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import type { Context } from 'hono';
 import { createHash } from 'node:crypto';
 

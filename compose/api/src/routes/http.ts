@@ -1,6 +1,6 @@
 // src/routes/http.ts
 import { handleLogWrite } from '@/handlers/httpHandler.js';
-import type { AppContext } from '@/types.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import { Hono } from 'hono';
 
 const httpRoutes = new Hono<AppContext>();

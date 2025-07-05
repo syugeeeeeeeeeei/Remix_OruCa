@@ -3,7 +3,7 @@ import { SERVER_CONFIG } from '@/config.js';
 import { broadcastData } from '@/handlers/webSocketHandler.js';
 import { httpRoutes } from '@/routes/http.js';
 import { webSocketRoutes } from '@/routes/websocket.js';
-import type { AppContext } from '@/types.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 

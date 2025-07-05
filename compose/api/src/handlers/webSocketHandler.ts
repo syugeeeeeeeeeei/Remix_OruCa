@@ -1,7 +1,7 @@
 // src/handlers/webSocketHandler.ts
 import { prisma } from '@/db.js';
-import type { TWsMessage, TWsPayLoad } from '@/types.js';
 import { hasProps, sendWsMessage } from '@/utils.js';
+import type { TWsMessage, TWsPayLoad } from '@ShardTypes/UserDefTypes/api/types.js';
 import type { WSContext } from 'hono/ws';
 import { createHash } from 'node:crypto';
 import type { WebSocket } from 'ws'; // ★修正点: WebSocket型をインポート
