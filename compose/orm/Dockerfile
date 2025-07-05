@@ -5,6 +5,12 @@ WORKDIR /app
 
 # Copy package.json and install dependencies (Prisma CLI etc.)
 COPY package.json ./
+
+# Install corepack and yarn v4
+RUN corepack enable && \
+	yarn set version stable && \
+	yarn config set nodeLinker node-modules
+
 # ★修正済み: --immutable, --production, --ignore-engines を削除しました
 RUN yarn install --network-timeout 100000 && \
 	yarn cache clean

@@ -1,30 +1,44 @@
+import { ChakraProvider } from "@chakra-ui/react";
+import { type LoaderFunctionArgs } from "@remix-run/node";
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  useOutletContext,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import { WebSocketProvider } from "~/contexts/WebSocketProvider";
+import { theme } from "~/lib/theme";
 
-import "./tailwind.css";
+// 型定義
+type OutletContextType = {
+  ENV: {
+    WS_URL: string;
+  }
+};
 
-export const links: LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
+// useOutletContext用のカスタムフック
+export function useEnvironment() {
+  return useOutletContext<OutletContextType>();
+}
+
+
+// --- サーバーサイドで環境変数を読み込むloader ---
+export async function loader({ }: LoaderFunctionArgs) {
+  return Response.json({
+    ENV: {
+      WS_URL: process.env.WS_URL || 'ws://localhost:3000',
+    },
+  });
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
-    <html lang="en">
+    <html lang="ja">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,7 +46,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ChakraProvider theme={theme}>
+          {/* OutletにENVを渡す */}
+          <WebSocketProvider ENV={ENV}>
+            {children}
+          </WebSocketProvider>
+        </ChakraProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

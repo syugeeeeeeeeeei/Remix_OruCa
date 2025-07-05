@@ -17,6 +17,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - API_BASE_URL=http://api:3000
       - WS_URL=ws://api:3000
+      - WSS_URL=wss://api:3000
     volumes:
       - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
       - ./ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
