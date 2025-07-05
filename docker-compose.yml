@@ -18,8 +18,8 @@ services:
       - API_BASE_URL=http://api:3000
       - WS_URL=ws://api:3000
     volumes:
-      - ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
-      - ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
+      - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
+      - ./ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
   api:
     build:
       context: ./compose/api
@@ -34,8 +34,8 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
     volumes:
-      - ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
-      - ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
+      - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:ro
+      - ./ShardTypes/UserDefTypes:/app/ShardTypes/UserDefTypes
 
   orm:
     build:
@@ -49,7 +49,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
     volumes:
-      - ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient:
+      - ./ShardTypes/PrismaClient:/app/ShardTypes/PrismaClient
   postgres:
     image: postgres:17-alpine
     environment:

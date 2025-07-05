@@ -1,6 +1,5 @@
 {
   "name": "orm",
-  "packageManager": "yarn@4.9.2",
   "devDependencies": {
     "prisma": "^6.11.1"
   },
