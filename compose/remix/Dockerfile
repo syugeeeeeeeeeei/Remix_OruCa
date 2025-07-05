@@ -24,5 +24,3 @@ COPY tailwind.config.ts ./
 COPY tsconfig.json ./
 COPY vite.config.ts ./
 
-# Build the Remix application (assuming 'build' script in package.json)
-RUN yarn build

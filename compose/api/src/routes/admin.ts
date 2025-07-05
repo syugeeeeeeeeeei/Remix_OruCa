@@ -1,6 +1,6 @@
-import type { AppContext } from '@/api/types.js';
-import { handleDeleteUser, handleUpdateUserName } from '@/handlers/adminHandler.js';
+import { handleDeleteUser, handleGetUsers, handleUpdateUserName } from '@/handlers/adminHandler.js';
 import { authMiddleware } from '@/middleware/auth.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import { Hono } from 'hono';
 
 const adminRoutes = new Hono<AppContext>();
@@ -9,6 +9,7 @@ const adminRoutes = new Hono<AppContext>();
 adminRoutes.use('*', authMiddleware);
 
 // 保護されたエンドポイント
+adminRoutes.get('/users', handleGetUsers); // ★追加
 adminRoutes.put('/users/:id/name', handleUpdateUserName);
 adminRoutes.delete('/users/:id', handleDeleteUser);
 

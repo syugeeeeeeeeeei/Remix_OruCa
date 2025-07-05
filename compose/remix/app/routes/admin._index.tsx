@@ -19,7 +19,9 @@ import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { z } from "zod";
 import { HomeButton } from "~/components/Buttons/HomeButton";
 import { HeadBar } from "~/components/HeadBar";
+import { getApiClient } from "~/lib/api.server";
 import { commitSession, getSession } from "~/lib/auth.server";
+
 
 const loginSchema = z.object({
 	student_ID: z.string().min(1, "学籍番号は必須です"),
@@ -45,22 +47,10 @@ export async function action({ request }: ActionFunctionArgs) {
 		return Response.json({ errors: validationResult.error.flatten().fieldErrors }, { status: 400 });
 	}
 
-	const { student_ID, password } = validationResult.data;
-	const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+	const api = getApiClient();
 
 	try {
-		const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ student_ID, password }),
-		});
-
-		if (!response.ok) {
-			const errorData = await response.json();
-			return Response.json({ errors: { form: errorData.message || "ログインに失敗しました" } }, { status: response.status });
-		}
-
-		const { token } = await response.json();
+		const { token } = await api.login(validationResult.data);
 		session.set("token", token);
 
 		return redirect("/admin/settings", {
@@ -69,7 +59,12 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		});
 	} catch (error) {
-		return Response.json({ errors: { form: "サーバーとの通信に失敗しました" } }, { status: 500 });
+		const status = error instanceof Response ? error.status : 500;
+		// ★★★ 修正点: APIからの具体的なエラーメッセージを抽出する ★★★
+		const errorData = error instanceof Response ? await error.json().catch(() => ({ message: "ログインに失敗しました" })) : { message: "サーバーとの通信に失敗しました" };
+
+		// `errorData.message` をフォームエラーとして返す
+		return Response.json({ errors: { form: errorData.message } }, { status });
 	}
 }
 
@@ -85,18 +80,19 @@ export default function LoginPage() {
 					<Form method="post">
 						<VStack spacing={6}>
 							<Heading size="lg">管理者ログイン</Heading>
+							{/* ★★★ 修正点: actionから返されたエラーメッセージを表示 ★★★ */}
 							{actionData?.errors?.form && (
-								<Text color="red.500">{actionData.errors.form}</Text>
+								<Text color="red.500" w="100%" textAlign="center">{actionData.errors.form}</Text>
 							)}
 							<FormControl isInvalid={!!actionData?.errors?.student_ID}>
 								<FormLabel>学籍番号</FormLabel>
 								<Input name="student_ID" type="text" />
-								<FormErrorMessage>{actionData?.errors?.student_ID}</FormErrorMessage>
+								<FormErrorMessage>{actionData?.errors?.student_ID?.[0]}</FormErrorMessage>
 							</FormControl>
 							<FormControl isInvalid={!!actionData?.errors?.password}>
 								<FormLabel>パスワード</FormLabel>
 								<Input name="password" type="password" />
-								<FormErrorMessage>{actionData?.errors?.password}</FormErrorMessage>
+								<FormErrorMessage>{actionData?.errors?.password?.[0]}</FormErrorMessage>
 							</FormControl>
 							<Button
 								type="submit"
@@ -113,4 +109,4 @@ export default function LoginPage() {
 			</Box>
 		</HeadBar>
 	);
-  }
+}

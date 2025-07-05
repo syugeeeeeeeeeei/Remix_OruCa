@@ -7,7 +7,7 @@ import { broadcastData, onClose, onError, onMessage, onOpen } from '@/handlers/w
 import { adminRoutes } from '@/routes/admin.js';
 import { authRoutes } from '@/routes/auth.js';
 import { httpRoutes } from '@/routes/http.js';
-import type { AppContext } from '@ShardTypes/UserDefTypes/types.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 
 // 1. Honoアプリケーションを初期化
 const app = new Hono<AppContext>();

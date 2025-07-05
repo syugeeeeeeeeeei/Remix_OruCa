@@ -7,7 +7,7 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./compose/remix:/app:delegated
+      - ./compose/remix:/app
       - /app/node_modules
     command: sh -c "yarn dev"
 
@@ -16,14 +16,14 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./compose/api:/app:delegated
+      - ./compose/api:/app
       - /app/node_modules
     command: sh -c "yarn dev"
 
   orm:
     container_name: orm_dev
     volumes:
-      - ./compose/orm:/app:delegated
+      - ./compose/orm:/app
       - /app/node_modules
     command: sh -c "npx prisma migrate dev --name init && npx prisma generate"
 

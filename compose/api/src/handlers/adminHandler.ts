@@ -1,7 +1,30 @@
-import type { AppContext } from '@/api/types.js';
 import { prisma } from '@/db.js';
 import { updateUserNameSchema } from '@/validators.js';
+import type { AppContext } from '@ShardTypes/UserDefTypes/api/types.js';
 import type { Context } from 'hono';
+
+// ユーザー一覧取得ハンドラ
+export const handleGetUsers = async (c: Context<AppContext>) => {
+	try {
+		// ★★★ 修正点 ★★★
+		// Logテーブルを主軸にして、関連するUser情報を取得するように変更。
+		// これにより、フロントエンドが期待する `{...log, user: {...user}}` の形式になる。
+		const logsWithUser = await prisma.log.findMany({
+			include: {
+				user: true, // Userの全フィールドをネストして取得
+			},
+			orderBy: {
+				updated_at: 'desc',
+			},
+		});
+
+		// フロントエンドが期待する `users` というキーでデータを返す
+		return c.json({ users: logsWithUser });
+	} catch (error) {
+		console.error("ユーザー一覧取得エラー:", error);
+		return c.json({ message: 'ユーザー一覧の取得に失敗しました' }, 500);
+	}
+};
 
 // ユーザー名更新ハンドラ
 export const handleUpdateUserName = async (c: Context<AppContext>) => {

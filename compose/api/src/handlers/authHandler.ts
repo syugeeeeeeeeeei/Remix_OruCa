@@ -15,8 +15,9 @@ export const handleLogin = async (c: Context) => {
 	const { student_ID, password } = validationResult.data;
 
 	const user = await prisma.user.findUnique({ where: { student_ID } });
+	// ★★★ 修正点1: ユーザーが存在しない場合のエラーメッセージを具体的にする ★★★
 	if (!user) {
-		return c.json({ message: '認証に失敗しました' }, 401);
+		return c.json({ message: '学籍番号が見つかりません。' }, 401);
 	}
 
 	// パスワードを検証 (既存のロジック)
@@ -24,8 +25,9 @@ export const handleLogin = async (c: Context) => {
 	const salt = generateSHA256Hash(student_ID);
 	const expectedToken = generateSHA256Hash(`${student_ID}${password}${salt}`);
 
+	// ★★★ 修正点2: パスワードが違う場合のエラーメッセージを具体的にする ★★★
 	if (user.student_token !== expectedToken) {
-		return c.json({ message: '認証に失敗しました' }, 401);
+		return c.json({ message: 'パスワードが間違っています。' }, 401);
 	}
 
 	// 検証成功後、JWTを生成

@@ -2843,6 +2843,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "commander@npm:12.1.0"
+  checksum: 10c0/6e1996680c083b3b897bfc1cfe1c58dfbcd9842fd43e1aaf8a795fbc237f65efcc860a3ef457b318e73f29a4f4a28f6403c3d653d021d960e4632dd45bde54a9
+  languageName: node
+  linkType: hard
+
 "commander@npm:^4.0.0":
   version: 4.1.1
   resolution: "commander@npm:4.1.1"
@@ -4572,7 +4579,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-proxy-agent@npm:^7.0.1":
+"https-proxy-agent@npm:^7.0.1, https-proxy-agent@npm:^7.0.5":
   version: 7.0.6
   resolution: "https-proxy-agent@npm:7.0.6"
   dependencies:
@@ -6084,6 +6091,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mute-stream@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "mute-stream@npm:2.0.0"
+  checksum: 10c0/2cf48a2087175c60c8dcdbc619908b49c07f7adcfc37d29236b0c5c612d6204f789104c98cc44d38acab7b3c96f4a3ec2cfdc4934d0738d876dbefa2a12c69f4
+  languageName: node
+  linkType: hard
+
 "mz@npm:^2.7.0":
   version: 2.7.0
   resolution: "mz@npm:2.7.0"
@@ -7087,6 +7101,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-use-websocket@npm:^4.13.0":
+  version: 4.13.0
+  resolution: "react-use-websocket@npm:4.13.0"
+  checksum: 10c0/92f0941c67984f3b43979a2e5aa9a358d1e2b01591575b09fdcdd638d0c4275f6c5e180d1173632bc0fd564458afc3583643635eaeb4e0b8ce059555576661f3
+  languageName: node
+  linkType: hard
+
 "react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
@@ -7102,6 +7123,15 @@ __metadata:
   dependencies:
     pify: "npm:^2.3.0"
   checksum: 10c0/90cb2750213c7dd7c80cb420654344a311fdec12944e81eb912cd82f1bc92aea21885fa6ce442e3336d9fccd663b8a7a19c46d9698e6ca55620848ab932da814
+  languageName: node
+  linkType: hard
+
+"read@npm:^4.0.0":
+  version: 4.1.0
+  resolution: "read@npm:4.1.0"
+  dependencies:
+    mute-stream: "npm:^2.0.0"
+  checksum: 10c0/5ad25883d6ffd0e63afe538166e22f1b67108d11fc9f9df65dedf0224b28871b0576f4f941c6f28febe53ca91a0338073c732be3fbd1a2bdad37bd25a9ff5ccf
   languageName: node
   linkType: hard
 
@@ -7222,11 +7252,13 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-icons: "npm:^5.5.0"
+    react-use-websocket: "npm:^4.13.0"
     remix-utils: "npm:^8.7.0"
     tailwindcss: "npm:^3.4.3"
     typescript: "npm:^5.8.3"
     vite: "npm:^5.4.19"
     vite-tsconfig-paths: "npm:^4.3.2"
+    wscat: "npm:^6.1.0"
     zod: "npm:^3.25.74"
   languageName: unknown
   linkType: soft
@@ -8823,6 +8855,35 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/bd7d5f4aaf04fae7960c23dcb6c6375d525e00f795dd20b9385902bd008c40a94d3db3ce97d878acc7573df852056ca546328b27b39f47609f80fb22a0a9b61d
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.0.0":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
+  languageName: node
+  linkType: hard
+
+"wscat@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "wscat@npm:6.1.0"
+  dependencies:
+    commander: "npm:^12.1.0"
+    https-proxy-agent: "npm:^7.0.5"
+    read: "npm:^4.0.0"
+    ws: "npm:^8.0.0"
+  bin:
+    wscat: bin/wscat
+  checksum: 10c0/ceb54d3d17ed388f177993530d13c05dde805e4914757655388a3851810218ae5454eb3fa465557b5fe84b06981a65839be9dd9bb2b34f3eb78f7d367e78ec09
   languageName: node
   linkType: hard
 

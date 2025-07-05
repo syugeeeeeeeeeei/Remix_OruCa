@@ -24,7 +24,12 @@ export default defineConfig({
         ws: true, // WebSocketプロキシを有効にする
       },
     },
+    watch: {
+      usePolling: true,
+      interval: 1000
+    }
   },
+  
   plugins: [
     remix({
       future: {

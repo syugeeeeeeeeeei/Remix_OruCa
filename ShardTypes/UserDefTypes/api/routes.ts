@@ -4,6 +4,8 @@ const staticRoutes = {
 	logWrite: '/api/log/write',
 	echo: '/api/echo',
 	webSocket: '/socket',
+	logs: '/api/', // メインページでのログ取得用
+	users: '/api/admin/users', // 管理者ページでのユーザー一覧取得用
 } as const;
 
 // パスパラメータが必要なルートは、引数を受け取る関数として定義
