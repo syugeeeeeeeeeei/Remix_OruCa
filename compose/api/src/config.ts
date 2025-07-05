@@ -5,7 +5,7 @@ dotenv.config();
 function getEnv(name: string, fallback?: string): string {
 	const value = process.env[name];
 	if (value) return value;
-	if (fallback) return fallback;
+	if (fallback || fallback?.length === 0) return fallback;
 	throw new Error(`環境変数 ${name} が設定されていません。`);
 }
 
